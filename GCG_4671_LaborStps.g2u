@@ -1,0 +1,427 @@
+Program.Sub.ScreenSU.Start
+Gui.Form..Create
+Gui.Form..Size(5505,3105)
+Gui.Form..MinX(0)
+Gui.Form..MinY(0)
+Gui.Form..Position(0,0)
+Gui.Form..BackColor(-2147483633)
+Gui.Form..MousePointer(0)
+Gui.Form..Event(UnLoad,Form_UnLoad)
+Gui.Form..Caption("Labor Step Information")
+Gui.Form..Sizeable(False)
+Gui.Form.lblLinerWeightScrap.Create(Label,"Liner Weight with Scrap (lbs)",True,2310,255,0,225,315,True,0,"Arial",8,-2147483633,0)
+Gui.Form.txtLinerWeightScrap.Create(TextBox,"",True,1215,300,0,300,540,True,0,"Arial",8,-2147483643,1)
+Gui.Form.txtLinerWeightScrap.NumericOnly(1)
+Gui.Form.txtLinerWeightScrap.TabStop(True)
+Gui.Form.txtLinerWeightScrap.TabIndex(1)
+Gui.Form.lblLinerWeightWOScrap.Create(Label,"Liner Weight without Scrap (lbs)",True,2565,255,0,2700,330,True,0,"Arial",8,-2147483633,0)
+Gui.Form.txtLinerWeightWOScrap.Create(TextBox,"",True,1215,300,0,2745,525,True,0,"Arial",8,-2147483643,1)
+Gui.Form.txtLinerWeightWOScrap.NumericOnly(1)
+Gui.Form.txtLinerWeightWOScrap.TabStop(True)
+Gui.Form.txtLinerWeightWOScrap.TabIndex(2)
+Gui.Form.lblStartupScrap.Create(Label,"Start Up Scrap",True,1335,255,0,255,1155,True,0,"Arial",8,-2147483633,0)
+Gui.Form.txtStartup.Create(TextBox,"",True,1215,300,0,315,1365,True,0,"Arial",8,-2147483643,1)
+Gui.Form.txtStartup.NumericOnly(1)
+Gui.Form.txtStartup.TabStop(True)
+Gui.Form.txtStartup.TabIndex(3)
+Gui.Form.lblTotalScrap.Create(Label,"Total Scrap",True,1005,255,0,3465,1155,True,0,"Arial",8,-2147483633,0)
+Gui.Form.txtTotal.Create(TextBox,"",True,1215,300,0,3495,1365,False,0,"Arial",8,-2147483643,1)
+Gui.Form.txtTotal.NumericOnly(1)
+Gui.Form.cmdSave.Create(Button)
+Gui.Form.cmdSave.Size(1065,375)
+Gui.Form.cmdSave.Position(345,1950)
+Gui.Form.cmdSave.Caption("Save")
+Gui.Form.cmdSave.Event(Click,cmdSave_Click)
+Gui.Form.cmdSave.TabStop(True)
+Gui.Form.cmdSave.TabIndex(5)
+Gui.Form.lblEnter.Create(Label,"Enter Scrap",True,1020,255,0,1890,1155,True,0,"Arial",8,-2147483633,0)
+Gui.Form.txtEnter.Create(TextBox,"",True,1215,300,0,1920,1365,True,0,"Arial",8,-2147483643,1)
+Gui.Form.txtEnter.NumericOnly(1)
+Gui.Form.txtEnter.TabStop(True)
+Gui.Form.txtEnter.TabIndex(4)
+Gui.Form.txtEnter.Event(LostFocus,txtEnter_Change)
+Gui.FormReport..Create
+Gui.FormReport..Caption("Report Parameters")
+Gui.FormReport..Size(4575,2250)
+Gui.FormReport..MinX(0)
+Gui.FormReport..MinY(0)
+Gui.FormReport..Position(0,0)
+Gui.FormReport..BackColor(-2147483633)
+Gui.FormReport..MousePointer(0)
+Gui.FormReport..Sizeable(False)
+Gui.FormReport..Event(UnLoad,FormReport_UnLoad)
+Gui.FormReport.lblBegJob.Create(Label,"Beginning Job",True,1320,255,0,270,315,True,0,"Arial",8,-2147483633,0)
+Gui.FormReport.lblEndJOb.Create(Label,"Ending Job",True,1065,255,0,2355,315,True,0,"Arial",8,-2147483633,0)
+Gui.FormReport.txtBegJob.Create(TextBox,"",True,1215,300,0,315,540,True,0,"Arial",8,-2147483643,1)
+Gui.FormReport.txtEndJob.Create(TextBox,"",True,1215,300,0,2385,540,True,0,"Arial",8,-2147483643,1)
+Gui.FormReport.cmdBegJobBrwse.Create(Button)
+Gui.FormReport.cmdBegJobBrwse.Size(405,300)
+Gui.FormReport.cmdBegJobBrwse.Position(1665,540)
+Gui.FormReport.cmdBegJobBrwse.Caption("^")
+Gui.FormReport.cmdBegJobBrwse.Event(Click,cmdBegJobBrwse_Click)
+Gui.FormReport.cmdendjobbrwse.Create(Button)
+Gui.FormReport.cmdendjobbrwse.Size(405,300)
+Gui.FormReport.cmdendjobbrwse.Position(3705,540)
+Gui.FormReport.cmdendjobbrwse.Caption("^")
+Gui.FormReport.cmdendjobbrwse.Event(Click,cmdendjobbrwse_Click)
+Gui.FormReport.cmdGenerate.Create(Button)
+Gui.FormReport.cmdGenerate.Size(1095,375)
+Gui.FormReport.cmdGenerate.Position(315,1095)
+Gui.FormReport.cmdGenerate.Caption("Generate")
+Gui.FormReport.cmdGenerate.Event(Click,cmdGenerate_Click)
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+F.Intrinsic.Control.SetErrorHandler("Main_Err")
+F.Intrinsic.Control.ClearErrors
+V.Local.sError.Declare(String)
+
+'Coded by: WAW
+'Date: 08/15/2017
+'This project will allow for additional information to be captured at the time a labor step is updated.
+'Hooks 15840 (script 1 button on Update Jobs in the GUI)
+'15850 Script 1 button on GUI
+
+F.ODBC.Connection!conx.OpenConnection(V.Ambient.PDSN,V.Ambient.PUser,V.Ambient.PPass)
+
+'see if the populate hoook on the gui has fired
+f.Intrinsic.Control.If(v.Caller.Hook,=,15840)
+	'set the script 1 button as Lbr Steps
+	v.Passed.000048.set ("Labor Steps")
+	
+f.Intrinsic.Control.Elseif(v.Caller.Hook,=,15850)
+	'call the laborsteps sub
+	f.Intrinsic.Control.CallSub(LaborSteps)
+f.Intrinsic.Control.EndIf
+
+'otherwise assume we are running from custom menu item and show report form
+f.Intrinsic.Control.If(v.caller.hook,<>,15840)
+f.Intrinsic.Control.AndIf(v.Caller.Hook,<>,15850)
+	'display the report form
+	gui.FormReport..Visible(true)
+f.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.ExitSub
+F.Intrinsic.Control.Label("Main_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4671_LaborStps.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	f.Intrinsic.Control.CallSub(form_unload)
+Function.Intrinsic.Control.EndIf
+Program.Sub.Main.End
+
+Program.Sub.Form_UnLoad.Start
+F.Intrinsic.Control.SetErrorHandler("Form_Unload_Err")
+F.Intrinsic.Control.ClearErrors
+V.Local.sError.Declare(String)
+
+'Close the connection and end the program
+F.ODBC.Connection!conx.Close
+F.Intrinsic.Control.End
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("Form_Unload_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4671_LaborStps.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	f.Intrinsic.Control.End
+Function.Intrinsic.Control.EndIf
+
+Program.Sub.Form_UnLoad.End
+
+Program.Sub.cmdSave_Click.Start
+F.Intrinsic.Control.SetErrorHandler("cmdSave_Click_Err")
+F.Intrinsic.Control.ClearErrors
+V.Local.sError.Declare(String)
+v.Local.ssql.Declare(String)
+v.Local.sjob.Declare(string)
+v.Local.ssuffix.Declare(string)
+v.Local.sseq.Declare(string)
+
+v.Local.sjob.Set(v.Passed.000004)
+v.Local.sseq.Set(v.Passed.000005)
+
+'pad the sequence
+f.Intrinsic.String.LPad(v.Local.sseq,"0",6,v.Local.sseq)
+
+f.Intrinsic.String.split(v.Local.sjob,"-",v.Local.sjob)
+v.Local.sjob.Set(v.Local.sjob(0))
+v.Local.ssuffix.Set(v.Local.sJob(1))
+f.Intrinsic.String.LPad(v.Local.ssuffix,"0",3,v.Local.ssuffix)
+f.Intrinsic.String.LPad(v.Local.sjob,"0",6,v.Local.sjob)
+
+'close the form
+gui.Form..Visible(false)
+
+'query for previously saved information
+f.Intrinsic.String.Build("Select * from GCG_4671_LaborStps where JOB = '{0}' and SUFFIX = '{1}' and SEQUENCE = '{2}'",v.Local.sjob.fieldvalTrim,v.Local.ssuffix.fieldvaltrim,v.Local.sseq.fieldvaltrim,v.Local.ssql)
+f.ODBC.Connection!conx.openrecordsetRW("rst",v.Local.ssql)
+
+f.Intrinsic.Control.If(v.ODBC.conx!rst.EOF,=,True)
+	f.ODBC.conx!rst.AddNew
+'	'save the values
+	f.ODBC.conx!rst.Set!JOB(v.Local.sjob)
+	f.ODBC.conx!rst.Set!SUFFIX(v.Local.sSUFFIX)
+	f.ODBC.conx!rst.Set!SEQUENCE(v.Local.sseq)	
+	f.ODBC.conx!rst.Set!DATE_TIME(v.Ambient.Now)	
+	f.ODBC.conx!rst.Set!LW_SCRAP(v.screen.Form!txtLinerWeightScrap.text)
+	f.ODBC.conx!rst.Set!LW_WOSCRAP(v.screen.Form!txtLinerWeightWOScrap.text)
+	f.ODBC.conx!rst.Set!STARTUP_SCRAP(v.screen.Form!txtStartup.text)
+	f.ODBC.conx!rst.Set!TOTAL_SCRAP(v.Screen.Form!txtTotal.text)	
+	f.ODBC.conx!rst.Update
+f.Intrinsic.Control.Else
+	f.ODBC.conx!rst.Set!DATE_TIME(v.Ambient.Now)	
+	f.ODBC.conx!rst.Set!LW_SCRAP(v.screen.Form!txtLinerWeightScrap.text)
+	f.ODBC.conx!rst.Set!LW_WOSCRAP(v.screen.Form!txtLinerWeightWOScrap.text)
+	f.ODBC.conx!rst.Set!STARTUP_SCRAP(v.screen.Form!txtStartup.text)
+	f.ODBC.conx!rst.Set!TOTAL_SCRAP(v.Screen.Form!txtTotal.text)	
+	f.ODBC.conx!rst.Update
+f.Intrinsic.Control.EndIf
+f.ODBC.Conx!rst.Close
+
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("cmdSave_Click_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4671_LaborStps.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	f.Intrinsic.Control.End
+Function.Intrinsic.Control.EndIf
+Program.Sub.cmdSave_Click.End
+
+Program.Sub.LaborSteps.Start
+F.Intrinsic.Control.SetErrorHandler("LaborSteps_Err")
+F.Intrinsic.Control.ClearErrors
+V.Local.sError.Declare(String)
+v.Local.ssql.Declare(String)
+v.Local.sjob.Declare(string)
+v.Local.ssuffix.Declare(string)
+v.Local.sseq.Declare(string)
+
+v.Local.sjob.Set(v.Passed.000004)
+v.Local.sseq.Set(v.Passed.000005)
+
+'pad the sequence
+f.Intrinsic.String.LPad(v.Local.sseq,"0",6,v.Local.sseq)
+
+f.Intrinsic.String.split(v.Local.sjob,"-",v.Local.sjob)
+v.Local.sjob.Set(v.Local.sjob(0))
+v.Local.ssuffix.Set(v.Local.sJob(1))
+
+f.Intrinsic.String.LPad(v.Local.ssuffix,"0",3,v.Local.ssuffix)
+f.Intrinsic.String.LPad(v.Local.sjob,"0",6,v.Local.sjob)
+
+'query for previously saved information
+f.Intrinsic.String.Build("Select * from GCG_4671_LaborStps where JOB = '{0}' and SUFFIX = '{1}'",v.Local.sjob.fieldvalTrim,v.Local.ssuffix.fieldvaltrim,v.Local.ssql)
+f.ODBC.Connection!conx.openrecordsetRO("rst",v.Local.ssql)
+
+f.Intrinsic.Control.If(v.ODBC.conx!rst.EOF,=,False)
+	'set the values on the screen
+	gui.Form.txtLinerWeightScrap.Text(v.ODBC.conx!rst.FieldValTrim!LW_SCRAP)
+	gui.Form.txtLinerWeightWOScrap.Text(v.ODBC.conx!rst.FieldValTrim!LW_WOSCRAP)
+	gui.Form.txtStartup.Text(v.ODBC.conx!rst.FieldValTrim!STARTUP_SCRAP)
+	gui.Form.txtTotal.Text(v.ODBC.conx!rst.FieldValTrim!TOTAL_SCRAP)
+f.Intrinsic.Control.EndIf
+f.ODBC.Conx!rst.Close
+
+'close the form
+gui.Form..Visible(True)
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("LaborSteps_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4671_LaborStps.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	f.Intrinsic.Control.End
+Function.Intrinsic.Control.EndIf
+
+Program.Sub.LaborSteps.End
+
+Program.Sub.cmdBegJobBrwse_Click.Start
+F.Intrinsic.Control.SetErrorHandler("cmdbegjobBrwse_Err")
+F.Intrinsic.Control.ClearErrors
+V.Local.sError.Declare(String)
+v.Local.stitles.Declare(string)
+v.Local.iwidths.Declare(long)
+v.Local.sret.Declare(string)
+
+f.Intrinsic.UI.setbrowserhottypeahead(True)
+
+'browse for the job
+Function.Intrinsic.String.Split("Job*!*Suffix*!*Part*!*Description*!*Customer*!*Due Date","*!*",variable.local.sTitles)
+Function.Intrinsic.String.Split("1000*!*800*!*2000*!*3000*!*800*!*1000","*!*",variable.local.iWidths)
+Function.Intrinsic.UI.Browser("Select a Job","conx","Select Job, Suffix, Part, Description, Customer, Date_Due From V_JOB_HEADER ORDER BY JOB, SUFFIX",Variable.Local.sTitles,Variable.Local.iWidths,Variable.Local.sRet)
+Function.Intrinsic.Control.If(Variable.Local.sRet,"=","***CANCEL***")
+ 	Function.Intrinsic.UI.Msgbox("No job was selected!")
+Function.Intrinsic.Control.Else
+ 	Function.Intrinsic.String.Split(Variable.Local.sRet,"*!*",Variable.Local.sRet)
+	'set the job in the textbox
+	gui.FormReport.txtbegJob.Text(v.Local.sret(0))
+	gui.FormReport.txtendJob.Text(v.Local.sret(0))	
+Function.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("cmdbegjobBrwse_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4671_LaborStps.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	f.Intrinsic.Control.callsub(formReport_Unload)
+Function.Intrinsic.Control.EndIf	
+
+Program.Sub.cmdBegJobBrwse_Click.End
+
+Program.Sub.cmdendjobbrwse_Click.Start
+F.Intrinsic.Control.SetErrorHandler("cmdendjobBrwse_Err")
+F.Intrinsic.Control.ClearErrors
+V.Local.sError.Declare(String)
+v.Local.stitles.Declare(string)
+v.Local.iwidths.Declare(long)
+v.Local.sret.Declare(string)
+
+f.Intrinsic.UI.setbrowserhottypeahead(True)
+
+'browse for the job
+Function.Intrinsic.String.Split("Job*!*Suffix*!*Part*!*Description*!*Customer*!*Due Date","*!*",variable.local.sTitles)
+Function.Intrinsic.String.Split("1000*!*800*!*2000*!*3000*!*800*!*1000","*!*",variable.local.iWidths)
+Function.Intrinsic.UI.Browser("Select a Job","conx","Select Job, Suffix, Part, Description, Customer, Date_Due From V_JOB_HEADER ORDER BY JOB, SUFFIX",Variable.Local.sTitles,Variable.Local.iWidths,Variable.Local.sRet)
+Function.Intrinsic.Control.If(Variable.Local.sRet,"=","***CANCEL***")
+ 	Function.Intrinsic.UI.Msgbox("No job was selected!")
+Function.Intrinsic.Control.Else
+ 	Function.Intrinsic.String.Split(Variable.Local.sRet,"*!*",Variable.Local.sRet)
+	'set the job in the textbox
+	gui.FormReport.txtendJob.Text(v.Local.sret(0))	
+Function.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("cmdendjobBrwse_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4671_LaborStps.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	f.Intrinsic.Control.callsub(formReport_Unload)
+Function.Intrinsic.Control.EndIf	
+Program.Sub.cmdendjobbrwse_Click.End
+
+Program.Sub.cmdGenerate_Click.Start
+F.Intrinsic.Control.SetErrorHandler("cmdGenerate_Click_Err")
+F.Intrinsic.Control.ClearErrors
+V.Local.sError.Declare(String)
+v.Local.irptid.Declare(long)
+v.Local.ilogid.Declare(long)
+v.Local.ibirunid.Declare(long)
+v.Local.svalues.Declare(String)
+v.Local.sparams.Declare(string)
+v.Local.ssql.Declare(String)
+
+v.Local.sjob.Declare(String)
+
+'make sure jobs were selected
+f.Intrinsic.Control.If(v.Screen.FormReport!txtBegJob.text,=,"")
+	F.Intrinsic.UI.Msgbox("Please select a beginning Job!")
+	f.Intrinsic.Control.ExitSub
+f.Intrinsic.Control.ElseIf(v.Screen.FormReport!txtEndJob.text,=,"")
+	F.Intrinsic.UI.Msgbox("Please select an ending Job!")
+	f.Intrinsic.Control.ExitSub
+f.Intrinsic.Control.EndIf
+
+gui.FormReport..Visible(false)
+
+'get report and run ID
+f.Global.BI.GetIDFromName("GCG_4671_LaborStps.rpt",v.Local.irptid)
+F.Global.BI.GetRunID(V.local.iBIRunID)
+
+F.Global.BI.StartLogging(V.local.iBIRunID,V.local.iRptID,0,"GCG_4671_LaborStps.rpt",V.local.iLogID)
+
+F.Global.BI.StopLogging(V.local.iLogID)
+
+V.Local.sParams.Set("JOB")
+
+'user comma delimited string 
+f.Intrinsic.String.Build("Select JOB from GCG_4671_LaborStps where JOB between '{0}' and '{1}'",v.Screen.FormReport!txtBegJob.text,V.screen.formreport!txtEndJob.text,V.Local.ssql)
+F.ODBC.Connection!conx.OpenRecordsetRO("rst",V.Local.ssql)
+F.Intrinsic.Control.DoUNTIL(V.ODBC.conx!rst.EOF,=,True)
+
+	f.Intrinsic.Control.If(v.Local.sjob,=,"")
+		v.Local.sjob.Set(v.ODBC.conx!rst.FieldValTrim!JOB)
+		f.Intrinsic.String.Build("'{0}'",v.Local.sjob,v.Local.sjob)
+	f.Intrinsic.Control.else
+		f.Intrinsic.String.Build("{0},'{1}'",v.Local.sjob,v.ODBC.conx!rst.FieldValTrim!JOB,v.Local.sjob)
+	f.Intrinsic.Control.endif	
+
+f.ODBC.conx!rst.MoveNext
+f.Intrinsic.Control.Loop
+
+
+F.Global.BI.RunReportPreProcessor(V.local.iBIRunID,V.local.iLogID,V.Local.sParams.Trim,V.Local.sjob,"GCG_4671_LaborStps.rpt",-1,True,"",-1,"",-1,"","",V.local.iLogID)
+
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("cmdGenerate_Click_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4671_LaborStps.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	f.Intrinsic.Control.callsub(formReport_Unload)
+Function.Intrinsic.Control.EndIf	
+Program.Sub.cmdGenerate_Click.End
+
+Program.Sub.FormReport_UnLoad.Start
+F.Intrinsic.Control.SetErrorHandler("FormReport_Unload_Err")
+F.Intrinsic.Control.ClearErrors
+V.Local.sError.Declare(String)
+
+'Close the connection and end the program
+F.ODBC.Connection!conx.Close
+F.Intrinsic.Control.End
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("FormReport_Unload_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4671_LaborStps.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	f.Intrinsic.Control.End
+Function.Intrinsic.Control.EndIf
+Program.Sub.FormReport_UnLoad.End
+
+Program.Sub.txtEnter_Change.Start
+F.Intrinsic.Control.SetErrorHandler("txtEnter_Change_Err")
+F.Intrinsic.Control.ClearErrors
+V.Local.sError.Declare(String)
+v.Local.ssql.Declare(String)
+v.Local.ftotal.Declare(float)
+v.Local.fenter.Declare(float)
+v.Local.fscrap.Declare(float)
+
+f.Intrinsic.Control.If(gui.Form.txtStartup.text,<>,"")
+	v.Local.fenter.Set(0)
+	v.Local.ftotal.Set(0)
+	'set the values for all textboxes
+	v.Local.fenter.Set(v.Screen.Form!txtEnter.text)
+	v.Local.ftotal.Set(v.Screen.Form!txtTotal.text)
+	v.Local.fscrap.Set(v.Screen.Form!txtStartup.text)
+	f.Intrinsic.Control.If(gui.Form.txtTotal.Text,=,"")
+		f.Intrinsic.Math.Add(v.Local.fenter.float,v.Local.ftotal.Float,v.Local.fscrap.Float,v.Local.ftotal)
+	f.Intrinsic.Control.Else
+		f.Intrinsic.Math.Add(v.Local.fenter.float,v.Local.ftotal.Float,v.Local.ftotal)
+	f.Intrinsic.Control.EndIf
+	f.Intrinsic.Math.Add(v.Local.fenter.float,v.Local.ftotal.Float,v.Local.ftotal)
+	gui.Form.txtTotal.Text(v.Local.ftotal)
+f.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.ExitSub
+
+F.Intrinsic.Control.Label("txtEnter_Change_Err")
+F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+	Function.Intrinsic.String.Concat("Project: GCG_4671_LaborStps.g2u",V.Ambient.Newline,V.Ambient.Newline,"Subroutine: ",V.Ambient.CurrentSubroutine,V.Ambient.NewLine,"Error Occurred ",V.Ambient.ErrorNumber," with description ",V.Ambient.ErrorDescription,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	f.Intrinsic.Control.callsub(form_Unload)
+Function.Intrinsic.Control.EndIf
+Program.Sub.txtEnter_Change.End
